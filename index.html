@@ -61,7 +61,7 @@
   #zoom-image {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: none;
     cursor: grab;
   }
   #minimap {
@@ -86,9 +86,9 @@
   <div id="loading-icon"></div>
 </div>
 <div id="image-container">
-  <img id="zoom-image" src="view.webp" alt="Zoomable Image">
+  <img id="zoom-image" src="http://apricotalliance.org/view" alt="Zoomable Image">
   <div id="minimap">
-    <img id="minimap-image" src="view.webp" alt="Minimap">
+    <img id="minimap-image" src="http://apricotalliance.org/view" alt="Minimap">
   </div>
 </div>
 <script>
@@ -98,11 +98,29 @@
   const minimapImage = document.getElementById('minimap-image');
   const minimap = document.getElementById('minimap');
 
+  let isImageLoaded = false;
+
   zoomImage.onload = () => {
-    loadingScreen.style.display = 'none';
+    isImageLoaded = true;
+    loadingScreen.style.animation = 'fadeOut 2s ease-in-out forwards';
+    loadingScreen.addEventListener('animationend', () => {
+      loadingScreen.style.display = 'none';
+      loadingScreen.style.animation = ''; // Reset animation for future use
+    });
+    
     imageContainer.style.visibility = 'visible';
     updateMinimap();
   };
+
+  // Check for image load completion every 100ms
+  const checkImageLoad = setInterval(() => {
+    if (isImageLoaded) {
+      clearInterval(checkImageLoad);
+    } else {
+      loadingScreen.style.animation = 'fadeIn 1s ease-in-out alternate infinite';
+    }
+  }, 100);
+
 
   let isDragging = false;
   let startX, startY, offsetX = 0, offsetY = 0, scaleFactor = 1;
